@@ -54,6 +54,17 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
             }
         }
 
+        private string _message;
+
+        public string Message
+        {
+            get { return _message; }
+            set
+            {
+                _port = value;
+                OnPropertyChanged(nameof(Message));
+            }
+        }
         public RelayCommand ConnectCommand { get; private set; }
         public RelayCommand SendCommand { get; private set; }
 
@@ -67,6 +78,14 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
             {
                 Debug.WriteLine("test" + _port);
              
+
+            }, () => !HasErrors);
+
+            //commands
+            SendCommand = new RelayCommand(() =>
+            {
+                Debug.WriteLine("send" + _port);
+
 
             }, () => !HasErrors);
 
@@ -134,9 +153,27 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
             if (string.IsNullOrEmpty(Name) )
 
                 listErrors3.Add("Bad Name");
-            propErrors[nameof(Name)] = listErrors2;
+            propErrors[nameof(Name)] = listErrors3;
 
             if (listErrors3.Count > 0)
+            {
+                OnPropertyErrorsChanged(nameof(Name));
+
+            }
+
+
+            if (propErrors.TryGetValue(Name, out var listErrors4) == false)
+                listErrors4 = new List<string>();
+            else
+               
+            listErrors4.Clear();
+
+            if (string.IsNullOrEmpty(Name))
+
+                listErrors4.Add("Bad Message");
+            propErrors[nameof(Name)] = listErrors4;
+
+            if (listErrors4.Count > 0)
             {
                 OnPropertyErrorsChanged(nameof(Name));
 

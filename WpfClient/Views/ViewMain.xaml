@@ -49,7 +49,7 @@
                 <StackPanel Margin="5" Orientation="Horizontal">
 
 
-                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}">Connect</Button>
+                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}" IsEnabled="False">Connect</Button>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -59,7 +59,7 @@
 
 
                     <Label Margin="5">Message</Label>
-                    <TextBox Margin="5" x:Name="TextBoxmessage" Text="{Binding Port,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="500"></TextBox>
+                    <TextBox Margin="5" x:Name="TextBoxmessage" Text="{Binding Message,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="500"></TextBox>
                 </StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
 
