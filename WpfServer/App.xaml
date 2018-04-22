@@ -1,0 +1,12 @@
+﻿<Application x:Class="WpfServer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:WpfServer.Views"
+             xmlns:viewModel="clr-namespace:WpfServer.ViewModel"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <DataTemplate DataType="{x:Type viewModel:MainViewModel}">
+            <v:MainView/>
+        </DataTemplate>
+    </Application.Resources>
+</Application>

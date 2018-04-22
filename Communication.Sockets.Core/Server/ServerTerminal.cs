@@ -9,16 +9,18 @@ namespace Chat.Core
 {
     public class ServerTerminal
     {
-        public event MessageRecivedDelegate MessageRecived;
+        
         public event ConnectDelegate ClientConnect;
         public event DisconnectDelegate ClientDisconnect;
+        public event MessageRecivedDelegate MessageRecived ;
 
         private Socket m_socket;
         private bool m_Closed;
 
         private Dictionary<long, ConnectedClient> m_clients = 
             new Dictionary<long, ConnectedClient>();
-        
+
+    
         public void StartListen(int port)
         {
             IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, port);
