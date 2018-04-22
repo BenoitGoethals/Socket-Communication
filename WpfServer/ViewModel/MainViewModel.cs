@@ -67,7 +67,7 @@ namespace WpfServer.ViewModel
         private void m_Terminal_MessageRecived(Socket socket, byte[] message)
         {
             Debug.WriteLine(ConvertBytesToString(message));
-            Listbox
+           
         }
 
         private void closeEvent()
@@ -82,18 +82,10 @@ namespace WpfServer.ViewModel
 
 
 
-        private string _server;
+      
         private string _port;
         private Dictionary<string, List<string>> propErrors = new Dictionary<string, List<string>>();
-        public string Server
-        {
-            get { return _server; }
-            set
-            {
-                _server = value;
-                OnPropertyChanged(nameof(Server));
-            }
-        }
+       
 
         public string Port
         {
@@ -116,9 +108,10 @@ namespace WpfServer.ViewModel
             //commands
             ConnectCommand = new RelayCommand(() =>
             {
-                Debug.WriteLine("test"+_server+_port);
-                ServerConnector.Connect(server:$"{Server}:{Port}");
+                Debug.WriteLine("test"+_port);
                 CreateEvent();
+                ServerConnector.Connect(Port);
+
             }, () => !HasErrors);
 
             PropertyChanged += (s, e) => Validate();
@@ -143,6 +136,7 @@ namespace WpfServer.ViewModel
         {
 
             //Validate Name property
+            /*
             if (propErrors.TryGetValue(Server, out var listErrors) == false)
                 listErrors = new List<string>();
             else
@@ -158,8 +152,9 @@ namespace WpfServer.ViewModel
                 OnPropertyErrorsChanged(nameof(Server));
 
             }
+            */
 
-            if (propErrors.TryGetValue(Server, out var listErrors2) == false)
+            if (propErrors.TryGetValue(Port, out var listErrors2) == false)
                 listErrors2 = new List<string>();
             else
                 listErrors2.Clear();

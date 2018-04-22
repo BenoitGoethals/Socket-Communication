@@ -39,8 +39,7 @@
     <StackPanel>
         <StackPanel Margin="5" Orientation="Horizontal">
 
-                    <Label Margin="5" Target="{Binding ElementName=TextBoxServer}">Server</Label>
-                    <TextBox x:Name="TextBoxServer" Text="{Binding Server,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="200" Margin="5"></TextBox>
+                   
                     <Label Margin="5" Target="{Binding ElementName=TextBoxPort}">port</Label>
                         <TextBox  Margin="5" x:Name="TextBoxPort" Text="{Binding Port,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="50"></TextBox>
 
@@ -48,7 +47,7 @@
     <StackPanel Margin="5" Orientation="Horizontal">
 
 
-                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}">Connect</Button>
+                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}">Start Server</Button>
 
       </StackPanel>
     </StackPanel>
