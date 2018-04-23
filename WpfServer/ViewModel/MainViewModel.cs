@@ -20,6 +20,27 @@ namespace WpfServer.ViewModel
         private ServerConnector ServerConnector=new ServerConnector();
 
 
+
+        private List<SimpleMessage> _messages=new List<SimpleMessage>();
+
+        public List<SimpleMessage> Messages
+        {
+            get { return _messages; }
+            set { _messages = value; }
+        }
+
+
+
+        private List<string> _logs=new List<string>();
+
+        public List<string> Logs
+        {
+            get { return _logs; }
+            set { _logs = value; }
+        }
+
+
+
         private void CreateEvent()
         {
            
@@ -57,16 +78,19 @@ namespace WpfServer.ViewModel
         private void m_Terminal_ClientDisConnected(Socket socket)
         {
             Debug.WriteLine($"Client {socket.LocalEndPoint} has been diconnected!");
+            _logs.Add($"Client {socket.LocalEndPoint} has been diconnected!");
         }
 
         private void m_Terminal_ClientConnected(Socket socket)
         {
             Debug.WriteLine($"Client {socket.LocalEndPoint} has been connected!");
+            _logs.Add($"Client {socket.LocalEndPoint} has been connected!");
         }
 
         private void m_Terminal_MessageRecived(Socket socket, byte[] message)
         {
             Debug.WriteLine(ConvertBytesToString(message));
+            _messages.Add(new SimpleMessage(ConvertBytesToString(message)));
            
         }
 
@@ -83,7 +107,7 @@ namespace WpfServer.ViewModel
    private Dictionary<string, List<string>> propErrors = new Dictionary<string, List<string>>();
 
       
-        private string _port;
+        private string _port="10001";
      
        
 
@@ -98,19 +122,31 @@ namespace WpfServer.ViewModel
         }
 
         public RelayCommand ConnectCommand { get; private set; }
+        public RelayCommand DisConnectCommand { get; private set; }
+       
 
-        
         public MainViewModel()
         {
-            
-            
 
-            //commands
-            ConnectCommand = new RelayCommand(() =>
+            DisConnectCommand = new RelayCommand(() =>
+            {
+                Debug.WriteLine("test" + _port);
+                CreateEvent();
+                ServerConnector.Connect(Port);
+                _logs.Add("Started server" + Port);
+
+            }, () => !HasErrors);
+
+           
+        
+
+        //commands
+        ConnectCommand = new RelayCommand(() =>
             {
                 Debug.WriteLine("test"+_port);
                 CreateEvent();
                 ServerConnector.Connect(Port);
+                _logs.Add("Started server" + Port);
 
             }, () => !HasErrors);
 
@@ -135,24 +171,6 @@ namespace WpfServer.ViewModel
             private void DataValidation()
         {
 
-            //Validate Name property
-            /*
-            if (propErrors.TryGetValue(Server, out var listErrors) == false)
-                listErrors = new List<string>();
-            else
-                listErrors.Clear();
-
-            if (string.IsNullOrEmpty(Server) || !Controle(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$", Server))
-
-                listErrors.Add("Bad IP");
-            propErrors[nameof(Server)] = listErrors;
-
-            if (listErrors.Count > 0)
-            {
-                OnPropertyErrorsChanged(nameof(Server));
-
-            }
-            */
 
             if (propErrors.TryGetValue(nameof(Port), out var listErrors2) == false)
                 listErrors2 = new List<string>();

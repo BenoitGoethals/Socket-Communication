@@ -72,10 +72,20 @@
             <TabControl Grid.Row="1" Margin="5">
                 
                 <TabItem Header="Messages" Name="Messages" >
-                    <ListBox x:Name="ListBoxMessages"></ListBox>
+                    <ListView x:Name="ListBoxMessages"  ItemsSource="{Binding Messages}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <TextBlock Text="Name: " />
+                                    <TextBlock Text="{Binding Message}" FontWeight="Bold" />
+                                    
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </TabItem>
                 <TabItem Header="Log" Name="Log">
-                    <ListBox x:Name="ListBoxLog"></ListBox>
+                    <ListView x:Name="ListBoxLog" ItemsSource="{Binding Logs}"></ListView>
                 </TabItem>
             </TabControl>
         </Border>

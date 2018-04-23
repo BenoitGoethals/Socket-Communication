@@ -29,47 +29,31 @@ namespace WpfClient.ViewModel
         ClientTerminal m_ClientTerminal = new ClientTerminal();
 
 
-        private void cmdConnect_Click(object sender, EventArgs e)
+        private List<SimpleMessage> _messages;
+
+        public List<SimpleMessage> Messages
         {
-            try
-            {
-
-                m_ClientTerminal.Connect(IPAddress.Parse(Server), Convert.ToInt16(Port, 10));
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
-            }
-
+            get { return _messages; }
+            set { _messages = value; }
         }
 
-        private void cmdSendMessage_Click(object sender, EventArgs e)
+
+
+        private List<string> _logs;
+
+        public List<string> Logs
         {
-            try
-            {
-
-
-                // Create the concrete message
-                SendingTimeMessage message = new SendingTimeMessage(Message);
-
-                int messageKind = (int) MessageKind.SendingTime;
-
-                byte[] buffer = MessageComposer.Serialize(messageKind, message);
-
-                // Send the message (as bytes) to the server.
-                m_ClientTerminal.SendMessage(buffer);
-
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
-            }
+            get { return _logs; }
+            set { _logs = value; }
         }
+
 
         void m_TerminalClient_MessageRecived(Socket socket, byte[] bytes)
         {
             string message = ConvertBytesToString(bytes);
             //   PresentMessage(listMessages, message);
+            Debug.WriteLine("Received : "+message);
+            _messages.Add(new SimpleMessage(message));
         }
 
 
@@ -89,21 +73,22 @@ namespace WpfClient.ViewModel
 
 
             //  PresentMessage(listLog, "Connection Opened!");
-
+            _logs.Add("Connection Opened!");
+        
             m_ClientTerminal.StartListen();
+            Debug.WriteLine("Received : " + message);
+            _logs.Add("Received : " + message);
             //      PresentMessage(listLog, "Start listening to server messages");
         }
 
         void m_TerminalClient_ConnectionDroped(Socket socket)
         {
-         //   new DisconnectDelegate(m_TerminalClient_ConnectionDroped), socket);
-            return;
-
-
-            //      cmdConnect.Enabled = true;
-            //       cmdClose.Enabled = false;
-
-            //      PresentMessage(listLog, "Server has been disconnected!");
+          
+        new DisconnectDelegate(m_TerminalClient_ConnectionDroped).Invoke(socket);
+                return;
+          
+         
+         //   PresentMessage(listLog, "Server has been disconnected!");
         }
 
 
@@ -240,7 +225,8 @@ private readonly Dictionary<string, ICollection<string>>
         }
 
         private string _message = "test";
-       
+    
+
         [StringLength(50, MinimumLength = 4,
             ErrorMessage = "The Message must be between 4 and 10 characters long")]    
         public string Message
@@ -266,7 +252,15 @@ private readonly Dictionary<string, ICollection<string>>
             ConnectCommand = new RelayCommand(() =>
             {
                 Debug.WriteLine("test" + _port+_server+_name);
-             
+                try
+                {
+
+                    m_ClientTerminal.Connect(IPAddress.Parse(Server), Convert.ToInt16(Port, 10));
+                }
+                catch (SocketException se)
+                {
+                    MessageBox.Show(se.Message);
+                }
 
             }, () => !HasErrors);
 
@@ -274,7 +268,25 @@ private readonly Dictionary<string, ICollection<string>>
             SendCommand = new RelayCommand(() =>
             {
                 Debug.WriteLine("send" + _message);
+                try
+                {
 
+
+                    // Create the concrete message
+                    SendingTimeMessage message = new SendingTimeMessage(Message);
+
+                    int messageKind = (int)MessageKind.SendingTime;
+
+                    byte[] buffer = MessageComposer.Serialize(messageKind, message);
+
+                    // Send the message (as bytes) to the server.
+                    m_ClientTerminal.SendMessage(buffer);
+                    _messages.Add(new SimpleMessage(_message));
+                }
+                catch (SocketException se)
+                {
+                    MessageBox.Show(se.Message);
+                }
 
             }, () =>!HasErrors);
 
