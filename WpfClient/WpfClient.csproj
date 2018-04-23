@@ -111,5 +111,15 @@
   <ItemGroup>
     <Folder Include="model\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Communication.Sockets.Core\Communication.Sockets.Core.csproj">
+      <Project>{dc7b20d0-b1d4-40e1-af98-7c4db3291a8d}</Project>
+      <Name>Communication.Sockets.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectA.Protocol\ProjectA.Protocol.csproj">
+      <Project>{b85d65b6-c509-4901-b9e6-66cd108a01e4}</Project>
+      <Name>ProjectA.Protocol</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

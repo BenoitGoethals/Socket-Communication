@@ -5,17 +5,190 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using Chat.Core;
+using ProjectA.Protocol;
 using WpfClient.utils;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace WpfClient.ViewModel
 {
     public class MainViewModel : INotifyDataErrorInfo
     {
-        private readonly Dictionary<string, ICollection<string>>
+
+
+
+        ClientTerminal m_ClientTerminal = new ClientTerminal();
+
+
+        private void cmdConnect_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                m_ClientTerminal.Connect(IPAddress.Parse(Server), Convert.ToInt16(Port, 10));
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message);
+            }
+
+        }
+
+        private void cmdSendMessage_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+
+                // Create the concrete message
+                SendingTimeMessage message = new SendingTimeMessage(Message);
+
+                int messageKind = (int) MessageKind.SendingTime;
+
+                byte[] buffer = MessageComposer.Serialize(messageKind, message);
+
+                // Send the message (as bytes) to the server.
+                m_ClientTerminal.SendMessage(buffer);
+
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message);
+            }
+        }
+
+        void m_TerminalClient_MessageRecived(Socket socket, byte[] bytes)
+        {
+            string message = ConvertBytesToString(bytes);
+            //   PresentMessage(listMessages, message);
+        }
+
+
+
+
+
+
+        void m_TerminalClient_Connected(Socket socket)
+        {
+            SimpleMessage message = new SimpleMessage("Hello There");
+
+            int messageKing = (int) MessageKind.Simple;
+
+            byte[] buffer = MessageComposer.Serialize(messageKing, message);
+
+            m_ClientTerminal.SendMessage(buffer);
+
+
+            //  PresentMessage(listLog, "Connection Opened!");
+
+            m_ClientTerminal.StartListen();
+            //      PresentMessage(listLog, "Start listening to server messages");
+        }
+
+        void m_TerminalClient_ConnectionDroped(Socket socket)
+        {
+         //   new DisconnectDelegate(m_TerminalClient_ConnectionDroped), socket);
+            return;
+
+
+            //      cmdConnect.Enabled = true;
+            //       cmdClose.Enabled = false;
+
+            //      PresentMessage(listLog, "Server has been disconnected!");
+        }
+
+
+        private string ConvertBytesToString(byte[] bytes)
+        {
+            //char[] chars = new char[iRx + 1];
+            //System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
+            //d.GetChars(bytes, 0, iRx, chars, 0);
+            //string szData = new string(chars);
+            //return szData;
+
+            int messageKind;
+            MessageBase msg;
+            MessageComposer.Deserialize(bytes, out messageKind, out msg);
+
+            MessageKind kind = (MessageKind) messageKind;
+
+            switch (kind)
+            {
+                case MessageKind.SendingTime:
+                    SendingTimeMessage sendingTimeMessage = (SendingTimeMessage) msg;
+                    return "SendingTimeMessage: " + sendingTimeMessage.Message;
+
+                case MessageKind.Simple:
+                    SimpleMessage simpleMessage = (SimpleMessage) msg;
+                    return "SimpleMessage: " + simpleMessage.Message;
+            }
+
+            return "UnKnown";
+
+        }
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+private readonly Dictionary<string, ICollection<string>>
             _validationErrors = new Dictionary<string, ICollection<string>>();
      
 
@@ -85,7 +258,9 @@ namespace WpfClient.ViewModel
         public MainViewModel()
         {
 
-            
+            m_ClientTerminal.Connected += m_TerminalClient_Connected;
+            m_ClientTerminal.Disconncted += m_TerminalClient_ConnectionDroped;
+            m_ClientTerminal.MessageRecived += m_TerminalClient_MessageRecived;
 
             //commands
             ConnectCommand = new RelayCommand(() =>
