@@ -39,17 +39,17 @@
             <StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
 
-                    <Label Margin="5">Server</Label>
-                    <TextBox x:Name="TextBoxServer" Width="200" Text="{Binding Server,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Margin="5"></TextBox>
-                    <Label Margin="5">port</Label>
-                    <TextBox Margin="5" x:Name="TextBoxPort" Text="{Binding Port,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="50"></TextBox>
-                    <Label Margin="5">ClientName</Label>
-                    <TextBox Margin="5" x:Name="TextBoxClientName" Text="{Binding Name,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="150"></TextBox>
+                    <Label  Target="{Binding ElementName=TextBoxServer}" Margin="5">Server</Label>
+                    <TextBox x:Name="TextBoxServer" Width="200" Text="{Binding Server}" Style="{StaticResource TextErrorStyle}"  Margin="5"></TextBox>
+                    <Label Margin="5" Target="{Binding ElementName=TextBoxPort}">port</Label>
+                    <TextBox Margin="5" x:Name="TextBoxPort" Text="{Binding Port}" Style="{StaticResource TextErrorStyle}"  Width="50"></TextBox>
+                    <Label Margin="5" Target="{Binding ElementName=TextBoxClientName}">ClientName</Label>
+                    <TextBox Margin="5" x:Name="TextBoxClientName" Text="{Binding Name}" Style="{StaticResource TextErrorStyle}"  Width="150"></TextBox>
                 </StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
 
 
-                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}" IsEnabled="False">Connect</Button>
+                    <Button Margin="5" x:Name="ButtonConnect"  Command="{Binding ConnectCommand}" >Connect</Button>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -59,7 +59,7 @@
 
 
                     <Label Margin="5">Message</Label>
-                    <TextBox Margin="5" x:Name="TextBoxmessage" Text="{Binding Message,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource TextErrorStyle}" Width="500"></TextBox>
+                    <TextBox Margin="5" x:Name="TextBoxmessage" Text="{Binding Message}"  Style="{StaticResource TextErrorStyle}" Width="500"></TextBox>
                 </StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
 

@@ -6,7 +6,7 @@
     
         xmlns:viewModel="clr-namespace:WpfClient.ViewModel"
         mc:Ignorable="d"
-        Title="ClientChat" Height="450" Width="800" IsEnabled="False">
+        Title="ClientChat" Height="450" Width="800" IsEnabled="true">
     <viewModel:MainViewModel/>
 </Window>
 

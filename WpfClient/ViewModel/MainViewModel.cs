@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,57 +15,68 @@ namespace WpfClient.ViewModel
 {
     public class MainViewModel : INotifyDataErrorInfo
     {
+        private readonly Dictionary<string, ICollection<string>>
+            _validationErrors = new Dictionary<string, ICollection<string>>();
+     
 
-private Dictionary<string, List<string>> propErrors = new Dictionary<string, List<string>>();
+        private string _port = "10001";
 
-        private string _port;
-        
+      
+        [StringLength(6, MinimumLength = 4,
+            ErrorMessage = "The Port must be between 4 and 6 characters long")]
+
         public string Port
         {
-            get { return _port; }
+            get => _port;
             set
             {
                 _port = value;
-                OnPropertyChanged(nameof(Port));
+             
+                ValidateModelProperty(value, nameof(Port));
             }
         }
 
 
-        private string _server;
-
+        private string _server = "127.0.0.1";
+      
+        [RegularExpression(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$", ErrorMessage = "The Server must only contain letters (a-z, A-Z).")]
         public string Server
         {
-            get { return _server; }
+            get => _server;
             set
             {
                 _server = value;
-                OnPropertyChanged(nameof(Server));
+                ValidateModelProperty(value, nameof(Server));
             }
         }
 
 
 
-        private string _name;
+        private string _name = "benoit";
 
+        [StringLength(50, MinimumLength = 10,
+            ErrorMessage = "The Name must be between 4 and 10 characters long")]
         public string Name
         {
-            get { return _port; }
+            get => _name;
             set
             {
-                _port = value;
-                OnPropertyChanged(nameof(Name));
+                _name = value;
+                ValidateModelProperty(value, nameof(Name));
             }
         }
 
-        private string _message;
-
+        private string _message = "test";
+       
+        [StringLength(50, MinimumLength = 4,
+            ErrorMessage = "The Message must be between 4 and 10 characters long")]    
         public string Message
         {
-            get { return _message; }
+            get => _message;
             set
             {
-                _port = value;
-                OnPropertyChanged(nameof(Message));
+                _message = value;
+                ValidateModelProperty(value, nameof(Message));
             }
         }
         public RelayCommand ConnectCommand { get; private set; }
@@ -71,25 +85,26 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
         public MainViewModel()
         {
 
-
+            
 
             //commands
             ConnectCommand = new RelayCommand(() =>
             {
-                Debug.WriteLine("test" + _port);
+                Debug.WriteLine("test" + _port+_server+_name);
              
 
             }, () => !HasErrors);
 
-            //commands
+         
             SendCommand = new RelayCommand(() =>
             {
-                Debug.WriteLine("send" + _port);
+                Debug.WriteLine("send" + _message);
 
 
-            }, () => !HasErrors);
+            }, () =>!HasErrors);
 
-            PropertyChanged += (s, e) => Validate();
+         //   PropertyChanged += (s, e) => Validate();
+          
         }
 
         private bool Controle(string reg, string prop)
@@ -104,130 +119,74 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
 
         private void Validate()
         {
-            Task.Run(() => DataValidation());
+           Task.Run(() => DataValidation());
         }
 
-        private void DataValidation()
+        protected void ValidateModelProperty(object value, string propertyName)
         {
+            if (_validationErrors.ContainsKey(propertyName))
+                _validationErrors.Remove(propertyName);
 
-
-            if (propErrors.TryGetValue(Server, out var listErrors) == false)
-                listErrors = new List<string>();
-            else
-                listErrors.Clear();
-
-            if (string.IsNullOrEmpty(Server) || !Controle(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$", Server))
-
-                listErrors.Add("Bad IP");
-            propErrors[nameof(Server)] = listErrors;
-
-            if (listErrors.Count > 0)
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+            ValidationContext validationContext =
+                new ValidationContext(this, null, null) { MemberName = propertyName };
+            if (!Validator.TryValidateProperty(value, validationContext, validationResults))
             {
-                OnPropertyErrorsChanged(nameof(Server));
-
-            }
-
-                if (propErrors.TryGetValue(Port, out var listErrors2) == false)
-                    listErrors2 = new List<string>();
-                else
-                    listErrors2.Clear();
-
-                if (string.IsNullOrEmpty(Port) || !Controle(@"(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})", Port))
-
-                    listErrors2.Add("Bad Port");
-                propErrors[nameof(Port)] = listErrors2;
-
-                if (listErrors2.Count > 0)
+                _validationErrors.Add(propertyName, new List<string>());
+                foreach (ValidationResult validationResult in validationResults)
                 {
-                    OnPropertyErrorsChanged(nameof(Port));
-
+                    _validationErrors[propertyName].Add(validationResult.ErrorMessage);
                 }
-
-
-
-            if (propErrors.TryGetValue(Name, out var listErrors3) == false)
-                listErrors3 = new List<string>();
-            else
-                listErrors3.Clear();
-
-            if (string.IsNullOrEmpty(Name) )
-
-                listErrors3.Add("Bad Name");
-            propErrors[nameof(Name)] = listErrors3;
-
-            if (listErrors3.Count > 0)
-            {
-                OnPropertyErrorsChanged(nameof(Name));
-
             }
-
-
-            if (propErrors.TryGetValue(Name, out var listErrors4) == false)
-                listErrors4 = new List<string>();
-            else
-               
-            listErrors4.Clear();
-
-            if (string.IsNullOrEmpty(Name))
-
-                listErrors4.Add("Bad Message");
-            propErrors[nameof(Name)] = listErrors4;
-
-            if (listErrors4.Count > 0)
-            {
-                OnPropertyErrorsChanged(nameof(Name));
-
-            }
-
-
+            RaiseErrorsChanged(propertyName);
         }
 
-        
-        
-
-        #region INotifyDataErrorInfo
-
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-
-        private void OnPropertyErrorsChanged(string p)
+        /* Alternative solution using LINQ */
+        protected void ValidateModelProperty_(object value, string propertyName)
         {
-            if (ErrorsChanged != null)
-                ErrorsChanged.Invoke(this, new DataErrorsChangedEventArgs(p));
+            if (_validationErrors.ContainsKey(propertyName))
+                _validationErrors.Remove(propertyName);
+
+            PropertyInfo propertyInfo = this.GetType().GetProperty(propertyName);
+            IList<string> validationErrors =
+                  (from validationAttribute in propertyInfo.GetCustomAttributes(true).OfType<ValidationAttribute>()
+                   where !validationAttribute.IsValid(value)
+                   select validationAttribute.FormatErrorMessage(string.Empty))
+                   .ToList();
+
+            _validationErrors.Add(propertyName, validationErrors);
+            RaiseErrorsChanged(propertyName);
         }
 
-        public System.Collections.IEnumerable GetErrors(string propertyName)
+        protected void DataValidation()
         {
-            List<string> errors;
-            if (propertyName != null)
+            _validationErrors.Clear();
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+            ValidationContext validationContext = new ValidationContext(this, null, null);
+            if (!Validator.TryValidateObject(this, validationContext, validationResults, true))
             {
-                propErrors.TryGetValue(propertyName, out errors);
-                return errors;
-            }
-
-            else
-                return null;
-        }
-
-        public bool HasErrors
-        {
-            get
-            {
-                try
+                foreach (ValidationResult validationResult in validationResults)
                 {
-                    var propErrorsCount = propErrors.Values.FirstOrDefault(r => r.Count > 0);
-                    if (propErrorsCount != null)
-                        return true;
+                    string property = validationResult.MemberNames.ElementAt(0);
+                    if (_validationErrors.ContainsKey(property))
+                    {
+                        _validationErrors[property].Add(validationResult.ErrorMessage);
+                    }
                     else
-                        return false;
+                    {
+                        _validationErrors.Add(property, new List<string> {validationResult.ErrorMessage});
+                    }
                 }
-                catch { }
-                return true;
             }
+            RaiseErrorsChanged(nameof(Name));
+            RaiseErrorsChanged(nameof(Port));
+            RaiseErrorsChanged(nameof(Server));
+            RaiseErrorsChanged(nameof(Message));
         }
 
-        # endregion
+      
 
-        #region INotifyPropertyChanged
+            #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged(string name)
@@ -235,10 +194,33 @@ private Dictionary<string, List<string>> propErrors = new Dictionary<string, Lis
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
-                Validate();
+               // Validate();
             }
         }
 
+        #endregion
+
+        #region INotifyDataErrorInfo members
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        private void RaiseErrorsChanged(string propertyName)
+        {
+            if (ErrorsChanged != null)
+                ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        public System.Collections.IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)
+                || !_validationErrors.ContainsKey(propertyName))
+                return null;
+
+            return _validationErrors[propertyName];
+        }
+
+        public bool HasErrors
+        {
+            get { return _validationErrors.Count > 0; }
+        }
         #endregion
     }
 }

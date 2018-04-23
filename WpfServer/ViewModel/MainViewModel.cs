@@ -80,11 +80,11 @@ namespace WpfServer.ViewModel
         }
 
 
-
+   private Dictionary<string, List<string>> propErrors = new Dictionary<string, List<string>>();
 
       
         private string _port;
-        private Dictionary<string, List<string>> propErrors = new Dictionary<string, List<string>>();
+     
        
 
         public string Port
@@ -154,7 +154,7 @@ namespace WpfServer.ViewModel
             }
             */
 
-            if (propErrors.TryGetValue(Port, out var listErrors2) == false)
+            if (propErrors.TryGetValue(nameof(Port), out var listErrors2) == false)
                 listErrors2 = new List<string>();
             else
                 listErrors2.Clear();
