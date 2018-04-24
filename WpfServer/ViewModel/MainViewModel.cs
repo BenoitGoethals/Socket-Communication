@@ -86,22 +86,40 @@ namespace WpfServer.ViewModel
             return "UnKnown";
         }
 
+
+        private void AddLog(string msg)
+        {
+            App.Current.Dispatcher.Invoke((System.Action)delegate
+            {
+                _logs.Add(msg);
+            });
+        }
+
+
+        private void AddMsg(SimpleMessage msg)
+        {
+            App.Current.Dispatcher.Invoke((System.Action)delegate
+            {
+                _messages.Add(msg);
+            });
+        }
+
         private void m_Terminal_ClientDisConnected(Socket socket)
         {
             Debug.WriteLine($"Client {socket.LocalEndPoint} has been diconnected!");
-            _logs.Add($"Client {socket.LocalEndPoint} has been diconnected!");
+            AddLog($"Client {socket.LocalEndPoint} has been diconnected!");
         }
 
         private void m_Terminal_ClientConnected(Socket socket)
         {
             Debug.WriteLine($"Client {socket.LocalEndPoint} has been connected!");
-            _logs.Add($"Client {socket.LocalEndPoint} has been connected!");
+            AddLog($"Client {socket.LocalEndPoint} has been connected!");
         }
 
         private void m_Terminal_MessageRecived(Socket socket, byte[] message)
         {
             Debug.WriteLine(ConvertBytesToString(message));
-            _messages.Add(new SimpleMessage(ConvertBytesToString(message)));
+            AddMsg(new SimpleMessage(ConvertBytesToString(message)));
            
         }
 
@@ -158,7 +176,7 @@ namespace WpfServer.ViewModel
             DisConnectCommand=new RelayCommand(() =>
             {
                 closeEvent();
-                _logs.Add("Stopped server" + Port);
+                AddLog("Stopped server" + Port);
                 Running = false;
             }, () => !HasErrors
             );
@@ -173,7 +191,7 @@ namespace WpfServer.ViewModel
                 Debug.WriteLine("test"+_port);
                 CreateEvent();
                 ServerConnector.Connect(Port);
-                _logs.Add("Started server" + Port);
+                AddLog("Started server" + Port);
 
             }, () => !HasErrors);
 
