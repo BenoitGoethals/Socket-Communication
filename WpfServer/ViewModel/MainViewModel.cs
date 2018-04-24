@@ -17,7 +17,7 @@ using WpfServer.utils;
 
 namespace WpfServer.ViewModel
 {
-   public class MainViewModel: INotifyDataErrorInfo
+   public class MainViewModel: INotifyDataErrorInfo,INotifyPropertyChanged
     {
 
         private ServerConnector ServerConnector=new ServerConnector();
@@ -38,9 +38,9 @@ namespace WpfServer.ViewModel
 
 
 
-        private ObservableCollection<string> _logs=new ObservableCollection<string>();
+        private List<string> _logs=new List<string>();
 
-        public ObservableCollection<string> Logs
+        public List<string> Logs
         {
             get { return _logs; }
             set
