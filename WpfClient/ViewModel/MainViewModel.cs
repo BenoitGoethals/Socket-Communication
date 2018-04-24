@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -29,7 +30,7 @@ namespace WpfClient.ViewModel
         ClientTerminal m_ClientTerminal = new ClientTerminal();
 
 
-        private List<SimpleMessage> _messages;
+        private List<SimpleMessage> _messages=new List<SimpleMessage>();
 
         public List<SimpleMessage> Messages
         {
@@ -38,8 +39,8 @@ namespace WpfClient.ViewModel
         }
 
 
-
-        private List<string> _logs;
+    
+        private List<string> _logs=new List<string>();
 
         public List<string> Logs
         {

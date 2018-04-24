@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="utils\BoolToVisibleOrHidden.cs" />
     <Compile Include="utils\RelayCommand.cs" />
     <Compile Include="ViewModel\DataServer.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />

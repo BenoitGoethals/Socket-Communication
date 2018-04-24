@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +9,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using Chat.Core;
 using ProjectA.Protocol;
 using WpfServer.utils;
@@ -20,23 +23,31 @@ namespace WpfServer.ViewModel
         private ServerConnector ServerConnector=new ServerConnector();
 
 
-
+        
         private List<SimpleMessage> _messages=new List<SimpleMessage>();
 
         public List<SimpleMessage> Messages
         {
             get { return _messages; }
-            set { _messages = value; }
+            set
+            {
+                _messages = value;
+                OnPropertyChanged(nameof(Messages));
+            }
         }
 
 
 
-        private List<string> _logs=new List<string>();
+        private ObservableCollection<string> _logs=new ObservableCollection<string>();
 
-        public List<string> Logs
+        public ObservableCollection<string> Logs
         {
             get { return _logs; }
-            set { _logs = value; }
+            set
+            {
+                _logs = value;
+                OnPropertyChanged(nameof(Logs));
+            }
         }
 
 
@@ -108,8 +119,8 @@ namespace WpfServer.ViewModel
 
       
         private string _port="10001";
-     
-       
+      
+
 
         public string Port
         {
@@ -121,28 +132,44 @@ namespace WpfServer.ViewModel
             }
         }
 
+        private bool _running;
+
+
+
+        public bool Running
+        {
+            get { return _running; }
+            set
+            {
+                _running = value;
+                OnPropertyChanged(nameof(Running));
+            }
+        }
+
         public RelayCommand ConnectCommand { get; private set; }
         public RelayCommand DisConnectCommand { get; private set; }
-       
+
 
         public MainViewModel()
         {
 
-            DisConnectCommand = new RelayCommand(() =>
+
+
+            DisConnectCommand=new RelayCommand(() =>
             {
-                Debug.WriteLine("test" + _port);
-                CreateEvent();
-                ServerConnector.Connect(Port);
-                _logs.Add("Started server" + Port);
+                closeEvent();
+                _logs.Add("Stopped server" + Port);
+                Running = false;
+            }, () => !HasErrors
+            );
 
-            }, () => !HasErrors);
 
-           
-        
 
-        //commands
-        ConnectCommand = new RelayCommand(() =>
+
+            //commands
+            ConnectCommand = new RelayCommand(() =>
             {
+                Running = true;
                 Debug.WriteLine("test"+_port);
                 CreateEvent();
                 ServerConnector.Connect(Port);
@@ -161,6 +188,8 @@ namespace WpfServer.ViewModel
 
             return match.Success;
         }
+
+       
 
 
         private void Validate()
@@ -233,21 +262,16 @@ namespace WpfServer.ViewModel
             }
         }
 
-        # endregion
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-                Validate();
-            }
-        }
-
         #endregion
+
+       
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
+      
+        
 }
 

@@ -6,10 +6,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  
     xmlns:local="clr-namespace:WpfServer"
+    xmlns:utils="clr-namespace:WpfServer.utils"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
 
+
+        <utils:BoolToVisibleOrHidden x:Key="BoolToVisConverter"/>
         <Style x:Key="TextErrorStyle" TargetType="{x:Type TextBox}">
             <Setter Property="Validation.ErrorTemplate">
                 <Setter.Value>
@@ -47,35 +50,37 @@
                              Text="{Binding Port,  ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource TextErrorStyle}" Width="50" />
 
+                    <Label  Visibility="{Binding Running,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisConverter}}" Foreground="#FFF53030">Running</Label>
+
                 </StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
 
-                    <ToggleButton Command="{Binding ConnectCommand}" Content="Connect"
-                                  CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}"/>
-                    <!--<Button Margin="5" x:Name="ButtonConnect" Command="{Binding ConnectCommand}">Start Server</Button>-->
+
+                    <Button Margin="5" x:Name="ButtonConnect" Command="{Binding ConnectCommand}">Start Server</Button>
+                    <Button Margin="5" x:Name="DisButtonConnect" Command="{Binding DisConnectCommand}" >Stop Server</Button>
 
                 </StackPanel>
             </StackPanel>
         </Border>
         <Border BorderThickness="5" Margin="2" Grid.Row="1" BorderBrush="Black">
             <TabControl Grid.Row="1" Margin="5">
-
+                <TabItem Header="Log" Name="Log">
+                    <ListView x:Name="ListBoxLog" ItemsSource="{Binding Logs,UpdateSourceTrigger=PropertyChanged}" />
+                </TabItem>
                 <TabItem Header="Messages" Name="Messages">
-                    <ListView x:Name="ListBoxMessages" ItemsSource="{Binding Messages}">
+                    <ListView x:Name="ListBoxMessages" ItemsSource="{Binding Messages,UpdateSourceTrigger=PropertyChanged}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <WrapPanel>
                                     <TextBlock Text="Name: " />
-                                    <TextBlock Text="{Binding Message}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding Path=Message}" FontWeight="Bold" />
 
                                 </WrapPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </TabItem>
-                <TabItem Header="Log" Name="Log">
-                    <ListView x:Name="ListBoxLog" ItemsSource="{Binding Logs}" />
-                </TabItem>
+              
             </TabControl>
         </Border>
     </Grid>

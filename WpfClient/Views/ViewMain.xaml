@@ -72,7 +72,7 @@
             <TabControl Grid.Row="1" Margin="5">
                 
                 <TabItem Header="Messages" Name="Messages" >
-                    <ListView x:Name="ListBoxMessages"  ItemsSource="{Binding Messages}">
+                    <ListView x:Name="ListBoxMessages"  ItemsSource="{Binding Messages,UpdateSourceTrigger=PropertyChanged}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <WrapPanel>
@@ -85,7 +85,7 @@
                     </ListView>
                 </TabItem>
                 <TabItem Header="Log" Name="Log">
-                    <ListView x:Name="ListBoxLog" ItemsSource="{Binding Logs}"></ListView>
+                    <ListView x:Name="ListBoxLog" ItemsSource="{Binding Logs,UpdateSourceTrigger=PropertyChanged}"></ListView>
                 </TabItem>
             </TabControl>
         </Border>
